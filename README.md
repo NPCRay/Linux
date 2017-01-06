@@ -60,3 +60,11 @@
 5. **查看文件类型**
  - `【file 文件】`
 
+### 环境变量
+1. 变量
+>`declare` 用于声明一个变量 `=`赋值 `$`调用 `echo` 控制台显示
+>eg. 
+```
+>declare tmp = hello word
+>echo $tmp```
+
