@@ -65,6 +65,15 @@
 >`declare` 用于声明一个变量 `=`赋值 `$`调用 `echo` 控制台显示
 >eg. 
 ```
->declare tmp = hello word
+>declare tmp=hello word
 >echo $tmp```
+
+2. 环境变量
+ - `set` 显示当前Shell所有环境变量，包括内建变量，用户自定义变量
+ - `env` 显示与当前用户相关的环境变量，可以让命令在指定的环境中运行
+ - `export` 显示从Shell中导出成环境变量，也能通过其定义变量导出为环境变量
+>export|sort>export.txt
+set|sort>set.txt
+env|sort>env.txt
+vimdiff export.txt env.txt set.txt
 
