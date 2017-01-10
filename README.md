@@ -121,3 +121,91 @@ $ find /etc/ -name interfaces```
  > `newer [file]`file为一个一存文件，列出比这个还新的文件
 
 ###文件打包和压缩
+> 安装程序 
+> `sudo apt-get install XXX`
+
+#### **zip**
+1. **压缩** `zip [options] [filepath]`
+ - option参数说明:
+ + -r 递归压缩，用于压缩文件
+ - -o 指定产生的压缩文件名后面接zipname
+ - -[0-9]指定压缩级别
+ - -q安静模式
+ - -e加密压缩包
+ - -l 将LF转为CR+LF
+ 
+ ```shell
+echo '##this is a  test!' > test.md
+zip -o fuck.zip fuck.md
+mkdir test
+cp fuck.md test/
+zip -r -o -e fuck2.zip fuck.md fuck1.zip test/
+Enter password:....
+Verify password:.... ```
+
+2. **解压** `unzip [option] [zipfile]`
+ - option参数说明:
+ - -q 静默模式.没有屏幕提示
+ - -l 只查看压缩包内容,不解压缩
+ - -O 大写字母O, 指定编码类型
+```shell
+unzip test.zip
+unzip -l test.zip```
+
+#### **rar**
+1. `rar`压缩
+2. `unrar`解压
+ - option参数说明:**没有`-`**
+ - a 添加文件到rar
+ - l 只查看压缩包内容,不解压缩
+ - d 从rar文件中删除文件
+ ```shell
+ rar a test.rar . ##注意点
+ rar a test.rar *.txt
+ unrar x test.rar text```
+ 
+####**tar**打包工具
+不压缩
+```shell
+tar -cf test.tar ./home ##创建tar
+tar -xf test.tar -c tardir ##解包tar
+tar -cfz text.tar.gz ./home ##创建并压缩
+tar -xfz test.tar.gz ##解压```
+其中压缩时各种格式使用不同参数
+*.tar.gz格式:	-z
+*.tar.xz格式:	-J
+*tar.bz2格式:	-j
+
+
+
+
+
+-
+-
+---
+-
+-
+-
+-
+-
+
+--
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
