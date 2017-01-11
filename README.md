@@ -127,12 +127,12 @@ $ find /etc/ -name interfaces```
 #### **zip**
 1. **压缩** `zip [options] [filepath]`
  - option参数说明:
- + -r 递归压缩，用于压缩文件
- - -o 指定产生的压缩文件名后面接zipname
- - -[0-9]指定压缩级别
- - -q安静模式
- - -e加密压缩包
- - -l 将LF转为CR+LF
+  `-r` 递归压缩，用于压缩文件
+  `-o` 指定产生的压缩文件名后面接zipname
+  `-[0-9]`指定压缩级别
+  `-q`安静模式
+  `-e`加密压缩包
+  `-l` 将LF转为CR+LF
  
  ```shell
 echo '##this is a  test!' > test.md
@@ -145,9 +145,9 @@ Verify password:.... ```
 
 2. **解压** `unzip [option] [zipfile]`
  - option参数说明:
- - -q 静默模式.没有屏幕提示
- - -l 只查看压缩包内容,不解压缩
- - -O 大写字母O, 指定编码类型
+  `-q` 静默模式.没有屏幕提示
+  `-l` 只查看压缩包内容,不解压缩
+  `-O` 大写字母O, 指定编码类型
 ```shell
 unzip test.zip
 unzip -l test.zip```
@@ -156,9 +156,9 @@ unzip -l test.zip```
 1. `rar`压缩
 2. `unrar`解压
  - option参数说明:**没有`-`**
- - a 添加文件到rar
- - l 只查看压缩包内容,不解压缩
- - d 从rar文件中删除文件
+  `a` 添加文件到rar
+  `l` 只查看压缩包内容,不解压缩
+  `d` 从rar文件中删除文件
  ```shell
  rar a test.rar . ##注意点
  rar a test.rar *.txt
@@ -172,38 +172,91 @@ tar -xf test.tar -c tardir ##解包tar
 tar -cfz text.tar.gz ./home ##创建并压缩
 tar -xfz test.tar.gz ##解压```
 其中压缩时各种格式使用不同参数
-*.tar.gz格式:	-z
-*.tar.xz格式:	-J
-*tar.bz2格式:	-j
+`*.tar.gz`格式:	`-z`
+`*.tar.xz`格式:	`-J`
+`*tar.bz2`格式:	`-j`
 
 
 
+###文件系统与磁盘操作
+`【pwd】`查看当前目录绝对路径
+`【df 】`查看文件系统和磁盘容量 `-h`以易懂方式显示（report file system disk space usage）
+`【du】`查看当前目录下所有子文件`-h`以易懂方式，`-d [0-9]`设置查看文件深度（estimate file space usage）
 
+`【dd】`命令
+`dd if=/dev/stdin of=test bs=10 count=1`
+>if为inFile路径，这里可以省略
+>of为outFile输出文件路径
+>bs为block size 用于指定块大小缺省为Byte，也可以K,M,G
+>count用于指定数量
+>当执行命令后在输入，会按指定大小bs指定数量count读取，如果多余会被当作命令
+>eg.执行以上命令后输入1234567890ls会列出当前目录下文件
+>而test文件中会有1234567890
 
--
--
----
--
--
--
--
--
+`dd if=/dev/stdin of=test bs=10 count=1 conv=ucase `
+>这条可以转换大小写
 
---
+####使用dd命令创建虚拟镜像文件
+1. 创建新文件`dd`
+```shell
+#从/dev/zero设备创建一个容量为256M的空文件 
+dd if=/dev/zero of=virtual.img bs=1M count=256
+#查看文件信息
+du -h virtual.img```
+2. 创建好的文件格式化`mkfs`
+```shell
+mkfs.ext4 virtual.img
+#会询问是否继续，ext4格式也可以其他格式```
 
+3. 将文件当作磁盘挂载`mount[-o[操作选项]][-t[文件系统类型]][-w|-rw|-ro][文件系统源][挂载点]`
+```shell
+mkdir virtual 
+mount -o loop -t ext4 virtural.img /home/virtual/
+mount -o loop -t ext4 virtual.img /mnt 
+# 也可以省略挂载类型，很多时候 mount 会自动识别
+# 以只读方式挂载
+mount -o loop --ro virtual.img /mnt```
+4. 卸载已挂载磁盘`umount`
+```shell
+# 命令格式 sudo umount 已挂载设备名或者挂载点，如：
+ sudo umount /mnt```
 
+5. 磁盘分区`fdisk`
+`sudo fdisk -l`查看分区情况
+`sudo fdisk virtual.img`进入磁盘分区模式
+在分区模式中`n`创建新的分区,`p`打印分区信息,`w`写入分好的分区表
 
+6. 挂载虚拟磁盘
+ - 使用 `losetup` 命令建立镜像与回环设备的关联
+```
+sudo losetup /dev/loop0 virtual.img
+# 如果提示设备忙你也可以使用其它的回环设备，"ls /dev/loop*"参看所有回环设备
+# 解除设备关联
+sudo losetup -d /dev/loop0```
+ - 为各分区建立虚拟设备的映射，用到`kpartx工具`，需要先安装：
+```
+sudo apt-get install kpartx
+#建立映射
+sudo kpart kpartx -av /dev/loop0
+# 取消映射
+sudo kpart kpartx -dv /dev/loop0```
+ - 使用mkfs格式化各分区
+```shell
+sudo mkfs.ext4 -q /dev/mapper/loop0p1
+sudo mkfs.ext4 -q /dev/mapper/loop0p5
+sudo mkfs.ext4 -q /dev/mapper/loop0p6```
 
-
-
-
-
-
-
-
-
-
-
+ - 在/media目录下新建四个空目录用于挂载虚拟磁盘：
+```shell
+$ mkdir -p /media/virtualdisk_{1..3}
+# 挂载磁盘分区
+$ sudo mount /dev/mapper/loop0p1 /media/virtualdisk_1
+$ sudo mount /dev/mapper/loop0p5 /media/virtualdisk_2
+$ sudo mount /dev/mapper/loop0p6 /media/virtualdisk_3
+# 卸载磁盘分区
+$ sudo umount /dev/mapper/loop0p1
+$ sudo umount /dev/mapper/loop0p5
+$ sudo umount /dev/mapper/loop0p6```
 
 
 
