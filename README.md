@@ -258,7 +258,12 @@ $ sudo umount /dev/mapper/loop0p1
 $ sudo umount /dev/mapper/loop0p5
 $ sudo umount /dev/mapper/loop0p6```
 
-
-
-
-
+### Linux任务计划crontab
+目的：定期的执行一些任务
+>`crontab -e`启动crontab 第一次会选择编辑工具
+>`*`表示任何；`,`表示并，都2，5；`-`表示到3-10；`/n`每隔0-59/5每隔5分钟
+```shell
+*/1 * * * * touch /home/$(date +\%Y\%m\%d\%H\%M\%S)
+#格式是：分 时 日 月 周 命令
+#这里表示每隔1分钟创建一个文件以时间为名```
+>注意 “ % ” 在 crontab 文件中，有结束命令行、换行、重定向的作用，前面加 ” \ ” 符号转意，否则，“ % ” 符号将执行其结束命令行或者换行的作用，并且其后的内容会被做为标准输入发送给前面的命令。
