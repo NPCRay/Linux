@@ -4,3 +4,5 @@
 ![对比](pic/常用的内置shell命令.png)
 ###shell中的元字符
 ![对比](pic/shell中的元字符.png)
+###IO重定向总结
+![io重定向.png](pic/io重定向.png)

@@ -40,6 +40,34 @@
 `【ls -l】`查看文件权限
 ![权限1](pic/权限1.png)
 ![权限1](pic/权限2.png)
+`【chmod】`修改权限
+ - 通过不同单位添加减
+  > ```
+  > chmod u-x file
+  > chmod o+w file```
+  u表示用户及拥有者
+  g表示组
+  o表示其他用户
+  -表示减少
+  +表示添加
+ - 通过二进制修改
+ >```
+ >chmod 777 file
+ >chmod 700 file```
+ >rwxrwxrwx = 111 111 111 = 777
+ >所以 700 = 111 000 000 = rwx------ 
+
+3. 属性 
+`【lsattr】`显示文件属性（attribution）
+`【chattr】`修改文件属性
+ >```
+ >lsattr file
+ >chattr +i file
+ >chattr -a file```
+ >i （immutable） 不可改变的，超级用户也不可以
+ >a (append only)只能追加内容不能修改删除
+
+
 ### Linux目录
 
 ![大分类](pic/分类.png)
