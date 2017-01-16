@@ -304,3 +304,63 @@ $ sudo umount /dev/mapper/loop0p6```
 
 
 ### 命令执行顺序
+1. 使用`;`来进行命令的分割
+2. 使用`|`来将输出变成下一个的输入
+3. `||`和`&&`来进行选择等操作
+
+###简单文本处理命令
+1. `【tr】`tr 命令可以用来删除一段文本信息中的某些文字。或者将其进行转换。
+` -d`	删除和set1匹配的字符，注意不是全词匹配也不是按字符顺序匹配
+`-s	`去除set1指定的在输入文本中连续并重复的字符
+```
+# 删除 "hello shiyanlou" 中所有的'o','l','h'
+$ echo 'hello shiyanlou' | tr -d 'olh'
+# 将"hello" 中的ll,去重为一个l
+$ echo 'hello' | tr -s 'l'
+# 将输入文本，全部转换为大写或小写输出
+$ cat /etc/passwd | tr '[:lower:]' '[:upper:]'
+# 上面的'[:lower:]' '[:upper:]'你也可以简单的写作'[a-z]' '[A-Z]',当然反过来将大写变小写也是可以的```
+2. `【col】`col 命令可以将Tab换成对等数量的空格建，或反转这个操作。
+`-x`	将Tab转换为空格
+`-h`	将空格转换为Tab（默认选项）
+```
+# 查看 /etc/protocols 中的不可见字符，可以看到很多 ^I ，这其实就是 Tab 转义成可见字符的符号
+$ cat -A /etc/protocols
+# 使用 col -x 将 /etc/protocols 中的 Tab 转换为空格,然后再使用 cat 查看，你发现 ^I 不见了
+$ cat /etc/protocols | col -x | cat -A```
+3. `【join】`这个命令就是用于将两个文件中包含相同内容的那一行合并在一起
+`-t`	指定分隔符，默认为空格
+`-i`	忽略大小写的差异
+`-1`	指明第一个文件要用哪个字段来对比，，默认对比第一个字段
+`-2`	指明第二个文件要用哪个字段来对比，，默认对比第一个字段
+```
+# 创建两个文件
+$ echo '1 hello' > file1
+$ echo '1 shiyanlou' > file2
+$ join file1 file2
+# 将/etc/passwd与/etc/shadow两个文件合并，指定以':'作为分隔符
+$ sudo join -t':' /etc/passwd /etc/shadow
+# 将/etc/passwd与/etc/group两个文件合并，指定以':'作为分隔符, 分别比对第4和第3个字段
+$ sudo join -t':' -1 4 /etc/passwd -2 3 /etc/group```
+
+4. `【paste】`paste这个命令与join 命令类似，它是在不对比数据的情况下，简单地将多个文件合并一起，以Tab隔开。
+`-d`	指定合并的分隔符，默认为Tab
+`-s`	不合并到一行，每个文件为一行
+```
+$ echo hello > file1
+$ echo shiyanlou > file2
+$ echo www.shiyanlou.com > file3
+$ paste -d ':' file1 file2 file3
+$ paste -s file1 file2 file3```
+
+### Linux 安装软件
+1. 在线安装
+`sudo apt-get install XXX`
+2. 磁盘安装
+不同的系统可能用的是不一样的软件管理工具，需要查看
+`sudo dpkg -i xxxx.deb`
+3. 二进制软件安装
+二进制包的安装比较简单，我们需要做的只是将从网络上下载的二进制包解压后放到合适的目录，然后将包含可执行的主程序文件的目录添加进PATH环境变量即可
+4. 源代码编译安装
+源代码可以通过编译器变成二进制文件后再安装
+
