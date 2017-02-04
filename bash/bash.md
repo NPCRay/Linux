@@ -157,9 +157,60 @@ ls -l | ./test.sh```
 ###16. 波浪号`~`
 home目录
 
+##变量
+###1.变量替换
+```bash
+a=123
+hello=$a```
+
+```
+*******************************************************************************
+# 强烈注意, 在赋值的的时候, 等号前后一定不要有空格.
+#  "VARIABLE =value"
+#                   ^
+#% 脚本将尝试运行一个"VARIABLE"的命令, 带着一个"=value"参数.
+#  "VARIABLE= value"
+#                      ^
+#% 脚本将尝试运行一个"value"的命令, 
+#+ 并且带着一个被赋值成""的环境变量"VARIABLE". 
+#*******************************************************************************```
+
+```bash
+echo hello    # hello 没有变量引用, 只是个hello字符串.
+
+echo $hello  # 123
+echo ${hello} # 123
+
+echo "$hello" # 123
+echo '$hello' # $hello
+echo "${hello}" # 123```
+>全引用（单引号）的作用将会导致"$"被解释为单独的字符, 而不是变量前缀. 
+使用单引号引用变量时候，变量的值不会被引用，只是简单的保持原始字符串.
+ 
+ 在bash中，当变量中有空格、tab之类的字符时候，
+ 如果需要打印这些字符，需要用双引号进行引用 "$hello".
+ 
+```bash
+hello="A B  C     D"
+echo $hello   # A B C D
+echo "$hello" # A B  C     D```
 
 
+```
+hello=    # 设置为空值.
+echo "\$hello (null value) = $hello"
+#  注意设置一个变量为null, 与unset这个变量, 并不是一回事
 
+echo "uninitialized_variable = $uninitialized_variable"
+# Uninitialized变量为null(就是没有值). 
+uninitialized_variable=   #  声明, 但是没有初始化这个变量,其实和前边设置为空值的作用是一样的. 
+echo "uninitialized_variable = $uninitialized_variable"  # 还是一个空值.
+uninitialized_variable=123       # 赋值.
+unset uninitialized_variable    # Unset这个变量.
+echo "uninitialized_variable = $uninitialized_variable" # 还是一个空值.```
+
+
+###2. 变量赋值
 
 
 
