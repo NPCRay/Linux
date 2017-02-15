@@ -278,4 +278,43 @@ echo "\\\z" #\\z
 echo \\\\z #\\z
 echo "\\\\z" #\\z```
 
+##退出码
+每一条命令执行后都会产生退出状态码`$?`用来表示上一条运行的结果，成功返回0，不成功就是非0值
+```
+echo $?```
+
+
 ##条件判断
+### **if/then**
+`[ ]`等价于`test `
+```
+if [ 1 -eq 1 ]
+then echo "equal"
+else echo "unequal"
+fi
+
+if test 1 -lt 1
+then echo "equal"
+else echo "unequal"
+fi
+
+if grep -q bash file
+then echo "FIle contauns at least one occurrence of bash"
+fi```
+
+
+
+多级比较
+```
+# 这里应该理解为子if/then当做一个整体作为测试条件
+if echo "Next *if* is part of the comparison for the first *if*."
+   if [[ $comparison = "integer" ]]
+     then (( a < b )) # (( 算数表达式 ))， 用作算数运算
+   else
+     [[ $a < $b ]]
+   fi
+then
+ echo '$a is less than $b'
+fi```
+
+
