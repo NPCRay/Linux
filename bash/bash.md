@@ -223,6 +223,8 @@ echo "$a"```
 $0，$1，$2，$3...
 >$0就是脚本文件自身的名字，$1 是第一个参数，$2 是第二个参数，$3 是第三个参数，然后是第四个。$9 之后的位置参数就必须用大括号括起来了，比如，${10}，${11}，${12}
 **两个比较特殊的变量 $* 和 $@ 表示所有的位置参数**
+`$*`位置参数被看作一个单词
+`$@`位置参数被看作独立引用的单词同数组
 
 ##引用和转义
 `\`作为转义符
@@ -278,6 +280,34 @@ echo "\\\z" #\\z
 echo \\\\z #\\z
 echo "\\\\z" #\\z```
 
+##操作符
+###赋值`=`
+###算术
+`+`	加法计算
+`-`	减法计算
+`*`	乘法计算
+`/`	除法计算
+`**`	幂运算
+`%`	模运算，或者是求余运算（返回一次除法运算的余数）
+###位操作符
+`<<` 左移一位（每次左移都相当于乘以2）
+`<<=` “左移-赋值”
+`let "var <<= 2" #这句的结果就是变量var左移2位(就是乘以4)`
+`\>>` 右移一位（每次右移都将除以2）
+`\>>=` “右移-赋值”（与<<=正好相反）
+`&` 按位与
+`&=` “按位与-赋值”
+`|` 按位或
+`|=` “按位或-赋值”
+`～` 按位反
+`!` 按位非
+`^` 按位异或XOR
+`^=` “按位异或-赋值”
+###逻辑运算符
+`&&`和`||`
+
+
+
 ##退出码
 每一条命令执行后都会产生退出状态码`$?`用来表示上一条运行的结果，成功返回0，不成功就是非0值
 ```
@@ -303,8 +333,7 @@ then echo "FIle contauns at least one occurrence of bash"
 fi```
 
 
-
-多级比较
+### **多级比较（不是嵌套条件分支）**
 ```
 # 这里应该理解为子if/then当做一个整体作为测试条件
 if echo "Next *if* is part of the comparison for the first *if*."
@@ -316,5 +345,202 @@ if echo "Next *if* is part of the comparison for the first *if*."
 then
  echo '$a is less than $b'
 fi```
+根据内if执行语句返回的退出码来进行判断
+
+### `test`即`[ ]`真假判断
+所有的字符串，数字都为真，未定义的变量，定义了未赋值的变量，“NULL”，空值为假
+
+###**((  ))**
+用于计算并测试算术表达式的结果,内部用的是C语言的形式
+结果为0或false退出码返回大于`1`的数，为除0以外或者true时，返回退出码为`0`
+`a=$(( 5 + 3 ))`，将把变量“`a`”设为“`5 + 3`”，或者`8`。
+
+
+### **操作符列举**
+就是`test`即`[ ]`加参数
+`-e`	文件存在
+`-a`	文件存在，这个选项的效果与 -e 相同。但是它已经被“弃用”了，并且不鼓励使用。
+`-f`	表示这个文件是一个一般文件（并不是目录或者设备文件）
+`-s`	文件大小不为零
+`-d`	表示这是一个目录
+`-b`	表示这是一个块设备（软盘，光驱，等等）
+`-c`	表示这是一个字符设备（键盘，modem，声卡，等等）
+`-p`	这个文件是一个管道
+`-h`	这是一个符号链接
+`-L`	这是一个符号链接
+`-S`	表示这是一个socket
+`-t`	文件（描述符）被关联到一个终端设备上，这个测试选项一般被用来检测脚本中的 stdin([ -t 0 ]) 或者 stdout([ -t 1 ])是否来自于一个终端
+`-r`	文件是否具有可读权限（指的是正在运行这个测试命令的用户是否具有读权限）
+`-w`	文件是否具有可写权限（指的是正在运行这个测试命令的用户是否具有写权限）
+`-x`	文件是否具有可执行权限（指的是正在运行这个测试命令的用户是否具有可执行权限）
+`-g`	set-group-id(sgid)标记被设置到文件或目录上
+`-k`	设置粘贴位
+`-O`	判断你是否是文件的拥有者
+`-G`	文件的group-id是否与你的相同
+`-N`	从文件上一次被读取到现在为止, 文件是否被修改过
+`f1 -nt f2`	文件f1比文件f2新
+`f1 -ot f2`	文件f1比文件f2旧
+`f1 -ef f2`	文件f1和文件f2是相同文件的硬链接
+`!`	“非”，反转上边所有测试的结果（如果没给出条件，那么返回真）
+
+###**二元比较操作符**
+####**整数比较**
+`-eq` 等于
+`-ne` 不等于
+`-gt` 大于
+`-ge` 大于等于
+`-lt` 小于
+`-le` 小于等于
+`<` 小于(在双括号中使用)
+`<=` 小于等于(在双括号中使用)
+`>`大于(在双括号中使用)
+`=` 大于等于(在双括号中使用)
+####**字符串比较**
+`=` 等于
+`==` 等于，与=等价
+`!=` 不等号
+`<` 小于，按照ASCII字符进行排序
+注意"<"使用在[ ]结构中的时候需要被转义否则变成管道输出
+`>` 大于，按照ASCII字符进行排序
+注意“>”使用在[ ]结构中的时候需要被转义
+`-z` 字符串为“null”，意思就是字符串长度为零 -n 字符串不为“null”
+
+##循环和分支
+###`for`循环
+```bash
+for planet in Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune Pluto
+do
+echo $planet  # 每个行星都被单独打印在一行上.
+done
+
+echo
+
+for planet in "Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune Pluto"
+# 所有的行星名称都打印在同一行上.
+# 整个'list'都被双引号封成了一个变量.
+do
+echo $planet
+done```
+###`while`循环
+```bash
+var0=0
+LIMIT=10
+while [ "$var0" -lt "$LIMIT" ]
+do
+  echo -n "$var0 "        # -n 将会阻止产生新行.
+
+  var0=`expr $var0 + 1`   # var0=$(($var0+1))  也可以.
+  # var0=$((var0 + 1)) 也可以.
+  # let "var0 += 1"    也可以.
+done                      # 使用其他的方法也行.```
+
+###`until`循环
+```bash
+END_CONDITION=end
+until [ "$var1" = "$END_CONDITION" ]
+# 在循环的顶部进行条件判断.
+do
+  echo "Input variable #1 "
+  echo "($END_CONDITION to exit)"
+  read var1
+  echo "variable #1 = $var1"
+  echo
+done```
+
+###嵌套循环
+```
+outer=1             # 设置外部循环计数.
+
+# 开始外部循环.
+for a in 1 2 3 4 5
+do
+  echo "Pass $outer in outer loop."
+  echo "---------------------"
+  inner=1           # 重置内部循环计数.
+  # ===============================================
+  # 开始内部循环.
+  for b in 1 2 3 4 5
+  do
+    echo "Pass $inner in inner loop."
+    let "inner+=1"  # 增加内部循环计数.
+  done
+# 内部循环结束.
+# ===============================================
+  let "outer+=1"    # 增加外部循环的计数.
+  echo              # 每次外部循环之间的间隔.
+done
+# 外部循环结束.```
+###循环控制
+1. `break`and`continue`
+###测试与分支
+`case（in）`等同于其他语言的`switch case`
+```bash
+echo "Hit a key, then hit return."
+read Keypress
+case "$Keypress" in
+[[:lower:]]   ) echo "Lowercase letter";;
+[[:upper:]]   ) echo "Uppercase letter";;
+[0-9]         ) echo "Digit";;
+ *             ) echo "Punctuation, whitespace, or other";;
+esac      #  允许字符串的范围出现在[中括号]中```
+
+2. `select`
+```bash
+PS3='Choose your favorite vegetable: ' # 设置提示符字串.
+echo
+select vegetable in "beans" "carrots" "potatoes" "onions" "rutabagas"
+do
+  echo
+  echo "Your favorite veggie is $vegetable."
+  echo "Yuck!"
+  echo
+  break  # 如果这里没有 'break' 会发生什么?
+done```
+
+##内置变量
+`$BASH`,`$FUNCNAME`,`$IFS`(内部域分隔符),`$REPLY`(最后read匿名输入变量)
+
+```bash
+# $IFS 处理空白与处理其他字符不同.
+output_args_one_per_line()
+{
+  for arg
+  do echo "[$arg]"
+  done
+}
+
+echo; echo "IFS=\" \""
+echo "-------"
+
+IFS=" "
+var=" a  b c   "
+output_args_one_per_line $var  # output_args_one_per_line `echo " a  b c   "`
+#
+# [a]
+# [b]
+# [c]
+
+echo; echo "IFS=:"
+echo "-----"
+IFS=:
+var=":a::b:c:::"               # 与上边一样, 但是用" "替换了":".
+output_args_one_per_line $var
+#
+# []
+# [a]
+# []
+# [b]
+# [c]
+# []
+# []
+# []
+
+# 同样的事情也会发生在awk的"FS"域中.
+echo```
+
+
+
+
+
 
 
